@@ -3,11 +3,36 @@ import {View, Text, Button} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NestedNavigator} from './NestedNavigator';
+import {useDispatch, useSelector} from 'react-redux';
+import {incrementParent, setSharedData} from '../reducers/parentSlice';
+import {ParentRootState} from '../store/parentStore';
 
 function HomeScreen({navigation}) {
+  const parentCount = useSelector(
+    (state: ParentRootState) => state.parent.value,
+  );
+  const shared = useSelector(
+    (state: ParentRootState) => state.parent.sharedData,
+  );
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    setInterval(() => {
+      console.log('increment');
+      dispatch(incrementParent());
+    }, 3000);
+    setInterval(() => {
+      console.log('shared');
+      dispatch(setSharedData(Math.random()));
+    }, 10000);
+  }, []);
+
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Home Screen</Text>
+      <Text>parentCount: {parentCount}</Text>
+      <Text>shared: {shared}</Text>
+      <Button title="increment" onPress={() => dispatch(incrementParent())} />
       <Button
         title="navigate to nested"
         onPress={() => navigation.navigate('Nested')}
